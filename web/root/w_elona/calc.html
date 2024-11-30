@@ -1,0 +1,104 @@
+<head>
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Expires" content="0">
+  <script type="text/javascript" src="calc.js" charset="utf-8"></script>
+</head>
+
+<body>
+    <!--script>
+    main();
+    </script -->
+    <form name="reaction_form">
+        <p>鑑定 : 
+            <label><input name="birthday" type="radio" value="1"/>
+                通常
+            </label>
+            <label><input name="birthday" type="radio" value="2" checked/>
+                先天
+            </label>
+            <label><input name="birthday" type="radio" value="5"/>
+                NPC
+            </label>
+        </p>
+        
+        マイナス : <input type="number" size="3" name="mana" value="100"><br/>
+        マナ限界 : <input type="number" size="3" name="mana_limit" value="50"><br/>
+        <input type="button" value="計算" onclick="calc_mana()"><br/>
+        反動　　 : <input type="number" size="3" name="reaction"><br/>
+    </form>
+    ーーーーー
+    <form name="price_form">
+        <p>売買 : 
+            <label><input name="trade" type="radio" disabled>
+                <font color=#808080>買</font>
+            </label>
+            <label><input name="trade" type="radio" checked/>
+                売
+            </label>
+        <p/>
+        <p>店 : 
+            <label><input name="shop" type="radio" checked/>
+                一般
+            </label><input name="shop" type="radio" disabled><lebal>
+                <font color=#808080>自分</font>
+            </label>
+        <p/>
+        <p>鑑定 : 
+            <label><input name="ex" type="radio" value="0" disabled/>
+                <font color=#808080>未鑑定</font>
+            </label>
+            <label><input name="ex" type="radio" value="1" disabled/>
+                <font color=#808080>名</font>
+            </label>
+            <label><input name="ex" type="radio" value="2" disabled/>
+                <font color=#808080>質/祝呪</font>
+            </label>
+            <label><input name="ex" type="radio" value="3" checked/>
+                完全
+            </label>
+        </p>
+        <p>祝呪 : 
+            <label><input name="state" value="0" type="radio"/>
+                普通
+            </label>
+            <label><input name="state" value="1" type="radio"/>
+                祝福
+            </label>
+            <label><input name="state" value="2" type="radio"/>
+                呪
+            </label>
+            <label><input name="state" value="3" type="radio"/>
+                堕落
+            </label>
+        </p>
+        <label><input id="" type="checkbox" disabled />
+            <font color=#808080>料理</font>
+        </label>
+        <label><input id="" type="checkbox" disabled/>
+            <font color=#808080>旅糧</font>
+        </label>
+        <label><input id="" type="checkbox" disabled/>
+            <font color=#808080>交易</font>
+        </label><br/>
+        <label><input id="" type="checkbox" disabled/>
+            <font color=#808080>魔法書</font>
+        </label>
+        <label><input id="" type="checkbox" disabled/>
+            <font color=#808080>魔術割</font>
+        </label><br/>
+        <label><input id="" type="checkbox" disabled/>
+            <font color=#808080>盗品</font>
+        </label>
+        <label><input id="" type="checkbox" disabled/>
+            <font color=#808080>盗品割</font>
+        </label><br/>
+
+        使用 : <input type="number" size="3" name="num_limit"><br/>
+        交渉 : <input type="number" size="3" name="lv"><br/>
+        価値 : <input type="number" size="3" name="cost"><br/>
+        <input type="button" value="値段" onclick="calc_price()"><br/>
+        値段 : <input type="number" size="3" name="value_"><br/>
+    </form>
+</body>

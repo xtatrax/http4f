@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8"/>
+	<script type="text/javascript" src="script/Adapter.js"></script>
+	<title>PHPとJavaScriptのアダプター</title>
+</head>
+<body>
+<script type="text/javascript">
+	//サーバサイドのアドレスを設定
+	var adapter = ADP.createAdapter("Main.php");
+	//複数の命令を実行(["クラス.ファンクション名",引数...)][...] 「on」でデータの受け取り
+	adapter.exec(["Test2.getValues"],["Test2.getValue",2]).on=function(values){
+		var output = "<pre>"
+		for(var i=0;i<values.length;i++)
+			output += i+"件目のデータ\n"+JSON.stringify(values[i])+"\n\n"; 
+		document.body.innerHTML += output+"</pre>";
+	}	
+</script>
+</body>
+</html>

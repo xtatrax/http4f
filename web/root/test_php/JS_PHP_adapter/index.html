@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8"/>
+	<script type="text/javascript" src="script/Adapter.js"></script>
+	<title>PHPとJavaScriptのアダプター</title>
+</head>
+<body>
+<script type="text/javascript">
+	//サーバサイドのアドレスを設定
+	var adapter = ADP.createAdapter("Main.php");
+	//命令を実行("クラス.ファンクション名",引数...) 「on」でデータの受け取り
+	adapter.exec("Test.add",10,20).on=function(value){
+		//受け取ったデータを表示
+		document.body.innerHTML += "10+20の結果: "+value;
+	}	
+</script>
+</body>
+</html>

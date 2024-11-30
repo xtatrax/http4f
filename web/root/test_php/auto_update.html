@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <script type="text/javascript" src="script/Adapter.js"></script>
+        <script type="text/javascript">
+            var adapter = ADP.createAdapter("Main.php");
+            function test_onclick(){
+                console.log("てすと");
+            }
+
+            function form_onclick(){
+                const logname = document.log_form.log_name;
+                const selectindex= logname.selectedIndex;
+                const selectname = color1.options[selectindex].value;
+                filepath="";
+                if( selectname == "debug_win"){
+                    var dd = new Date();
+                    var y = dd.getFullYear();
+                    var m = dd.getMonth();
+                    var d = dd.getDate();
+                    filepath = "C:/00_dev/env/Apache24/logs/access_"+y+"-"+m+"-"+d+".log";
+                }else{
+                    filepath="/var/log/httpd/"+selectname;
+                }
+                file_draw(filepath);
+            }
+            function file_draw(filepath){
+                adapter.exec("ReadFile.read",filepath).on=function(value){
+                    console.log(value);
+                }   
+            }
+            function draw_loop(filepath){
+                var id = setInterval(function () {
+                    file_draw(filepath);
+                }, 10000);
+            }
+        </script>
+    </head>
+    <body>
+        <form name="log_form">
+            <select name="log_name">
+                <option value="debug_win">debug_win</option>
+                <option value="acsses_log">acsses_log</option>
+                <option value="acsses_my_log">acsses_my_log</option>
+                <option value="error_log">error_log</option>
+                <option value="ssl_acsses_log">ssl_acsses_log</option>
+                <option value="ssl_error_log">ssl_error_log</option>
+                <option value="ssl_request_log">ssl_request_log</option>
+            </select>
+            <input type="submit" value="送信" onclick="test_onclick()"/>
+        </form>
+        </div name="js_log_home">
+
+    </body>
+</html>
