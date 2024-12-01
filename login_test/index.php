@@ -1,12 +1,12 @@
 <?php
 	session_start();
-	$_SESSION["ID"];
+	//#$_SESSION["ID"];
 	if( isset( $_COOKIE["ID"] ) ) {
-
+		echo $_COOKIE["ID"];
 	}else{
-		#isset
+		echo "not found";
 	}
 
 
-	include "template.html"
+	include "template.html";
 ?>
