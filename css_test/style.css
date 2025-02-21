@@ -1,0 +1,10 @@
+
+:--cbgc{
+	color : #FFFF;
+}
+.main{
+}
+.sub{
+	background-color: aqua;
+	@include 
+}
