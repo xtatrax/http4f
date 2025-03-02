@@ -5,8 +5,27 @@
 		<script src="main.js"></script>
 	</head>
 	<body>
-	<div id="countdownArea" class="countdown">
-		<span id="countdown-min"></span>分
-		<span id="countdown-sec"></span>秒
+		<div id="countdownArea" class="countdown">
+			<span id="countdown-min"></span>分
+			<span id="countdown-sec"></span>秒
+		</div>
+		<label for="startTime">開始時刻: </label>
+		<input type="time" id="startTime" step="2"/>
+		<p>
+			<code>time</code> 入力欄の値:
+			<code> "<span id="value">n/a</span>"</code>
+		</p>
+		<script>
+			const startTime = document.getElementById("startTime");
+			const valueSpan = document.getElementById("value");
+			startTime.value = "00:00:00";
+			startTime.addEventListener(
+				"input",
+				() => {
+					valueSpan.innerText = startTime.value;
+				},
+				false,
+			);
+		</script>
 	</body>
-</div>
+</html>

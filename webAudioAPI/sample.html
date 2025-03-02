@@ -1,0 +1,282 @@
+<!doctype html>
+<!-- サンプル元 https://keens.github.io/blog/2020/11/14/burauzauedeongakuwoensousuru/ -->
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Document</title>
+    </head>
+    <body>
+        <div class="controls">
+            <div class="left">
+                <div id="playButton" class="button">
+                    ▶️ play
+                </div>
+            </div>
+            <div class="right">
+                <span>Volume: </span>
+                <input type="range" min="0.0" max="1.0" step="0.01"
+                       value="0.8" name="volume" id="volumeControl">
+            </div>
+            <div id="typeList">
+
+            </div>
+        </div>
+
+        <script>
+            function createItems(select,data){
+                
+            }
+            function createList(ID){
+                let listbase = document.createElement("select");
+            }
+            window.onload = function(){
+                let type = document.getElementById("typeList");
+                
+            }
+
+            function getBaceType(){
+
+            }
+         // LICENSE: MIT/Apache-2.0
+         class Note {
+             constructor(step, octave, duration) {
+                 const noteTable = {
+                     "C" : -9,
+                     "C#": -8, "Cs": -8, "Df": -8,
+                     "D" : -7,
+                     "D#": -6, "Ds": -6, "Ef": -6,
+                     "E" : -5,
+                     "F" : -4,
+                     "F#": -3, "Fs": -3, "Gf": -3,
+                     "G" : -2,
+                     "G#": -1, "Gs": -1, "Af": -1,
+                     "A" :  0,
+                     "A#":  1, "As":  1, "Bf":  1,
+                     "B" :  2
+                 };
+                 this.detune = noteTable[step] * 100 + (octave - 4) * 1200;
+                 this.duration = duration;
+             }
+
+             realDuration(bpm) {
+                 bpm = bpm || 60;
+                 return 1  * (60 / bpm) / this.duration * 4;
+             }
+         }
+
+         class Tone {
+             ctx
+             concertPitch
+         }
+
+         class SimpleTone extends Tone {
+             type = 'sine';
+             constructor(type) {
+                 super()
+                 this.type = type;
+                 this.osc = null;
+             }
+
+             play(detune, start, duration, output) {
+                 const osc = this.ctx.createOscillator();
+                 osc.type = this.type;
+                 osc.frequency.value = this.concertPitch;
+                 osc.detune.value = detune;
+                 osc.connect(output);
+                 osc.onended = function() {
+                     osc.disconnect(output)
+                 };
+                 osc.start(start);
+                 osc.stop(start + duration * 0.9);
+                 return osc;
+             }
+         }
+
+         class PianoTone extends Tone {
+             createOsc(detune, gain, start, duration, output) {
+                 const attack = 0.2;
+                 const decay = 0.1;
+                 const sustain = gain * 0.7;
+                 const release = 0.3;
+
+                 const osc = this.ctx.createOscillator();
+                 osc.frequency.value = this.concertPitch;
+                 osc.detune.value = detune;
+                 osc.type = 'triangle';
+
+                 const gainNode = this.ctx.createGain();
+                 const t0 = start;
+                 const t1 = t0 + attack;
+                 const t2 = t1 + decay;
+                 const t3 = t0 + duration;
+                 const t4 = t3 + release;
+                 gainNode.gain.linearRampToValueAtTime(gain, t1);
+                 gainNode.gain.setTargetAtTime(sustain, t1, decay)
+                 gainNode.gain.setTargetAtTime(0, t3, release);
+
+                 osc.connect(gainNode);
+                 gainNode.connect(output);
+                 osc.onended = function() {
+                     osc.disconnect(gainNode);
+                     gainNode.disconnect(output);
+                 }
+
+                 osc.start(t0);
+                 osc.stop(t4);
+                 return osc;
+             }
+
+             play(detune, start, duration, output) {
+                 let o1 = this.createOsc(detune - 3600, 0.512, start, duration * 0.064, output);
+                 let o2 = this.createOsc(detune - 2400, 0.64 , start, duration * 0.16 , output);
+                 let o3 = this.createOsc(detune - 1200, 0.8  , start, duration * 0.4  , output);
+                 let o4 = this.createOsc(detune       ,   1  , start, duration        , output);
+                 let o5 = this.createOsc(detune + 1200, 0.4  , start, duration * 0.8  , output);
+                 let o6 = this.createOsc(detune + 2400, 0.16 , start, duration * 0.64 , output);
+                 let o7 = this.createOsc(detune + 3600, 0.064, start, duration * 0.512, output);
+                 return {
+                     oscs: [o1, o2, o3, o4, o5, o6, o7],
+                     stop: function(when) {
+                         for(let osc of this.oscs) {
+                             osc.stop(when)
+                         }
+                     }
+                 };
+             }
+         }
+
+         class Music {
+             constructor(notes) {
+                 this.notes = notes;
+             }
+
+             [Symbol.iterator]() {
+                 return this.notes[Symbol.iterator]();
+             }
+
+             static parse(input) {
+                 const notes = [];
+
+                 let octave = 4;
+                 let duration = 4;
+                 for(let c of input.split(' ')) {
+                     if (c === '|' || c === "" || c === "\n" ) {
+                         continue;
+                     }
+
+                     let ret = c.match(/([A-G][#sf]?)([-+]*)(16|8|4|2|1)?/);
+                     if (ret) {
+                         let step = ret[1];
+                         for(let o of ret[2]) {
+                             switch (o) {
+                                 case "+": octave++;
+                                 case "-": octave--;
+                             }
+                         }
+                         if(ret[3]) {
+                             duration = parseInt(ret[3]);
+                         }
+                         notes.push(new Note(step, octave, duration));
+                     } else {
+                         throw "parse error";
+                     }
+                 }
+                 return new this(notes);
+             }
+         }
+
+         class Player {
+             constructor(bpm, tone, concertPitch) {
+                 this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+                 const gain = this.ctx.createConstantSource();
+                 const gainNode = this.ctx.createGain();
+                 gainNode.gain.value = 0.025;
+                 gain.connect(gainNode.gain);
+                 gain.start();
+                 gain.offset.value = 0.25;
+                 gainNode.connect(this.ctx.destination);
+
+                 this.output = gainNode;
+                 this._gain = gain;
+                 this.bpm = bpm;
+                 this.tone = tone || new SimpleTone('square');
+                 this.tone.ctx = this.ctx;
+                 this.tone.concertPitch = concertPitch || 440;
+                 this.playingNotes = [];
+                 this.isPlaying = false;
+             }
+
+             get gain() {
+                 this._gain.offset.value;
+             }
+
+             set gain(gain) {
+                 this._gain.offset.value = gain;
+
+             }
+
+             playNote(note, at) {
+                 at = at || 0;
+                 const duration = note.realDuration(this.bpm);
+                 let playingNote = this.tone.play(note.detune, at, duration, this.output);
+                 return playingNote;
+             }
+
+             playMusic(music) {
+                 this.isPlaying = true;
+                 let start = this.ctx.currentTime;
+                 for (let note of music) {
+                     let playingNote = this.playNote(note, start);
+                     start += note.realDuration(this.bpm);
+                     this.playingNotes.push(playingNote);
+                 }
+             }
+
+             cancel() {
+                 this.isPlaying = false;
+                 for(let note of this.playingNotes) {
+                     note.stop()
+                 }
+             }
+         }
+
+         // create Oscillator node
+         function setup() {
+
+             const music = Music.parse("\
+             C  C  G  G  | A  A  G2 |\
+             F4 F  E  E  | D  D  C2 |\
+             G4 G  F  F  | E  E  D2 |\
+             G4 G  F  F  | E  E  D2 |\
+             C4 C  G  G  | A  A  G2 |\
+             F4 F  E  E  | D  D  C2 |");
+             const player = new Player(90, new PianoTone());
+             function togglePlay(event) {
+                 if (player.isPlaying) {
+                     playButton.innerHTML = "▶️ play";
+                     player.cancel();
+                 } else {
+                     playButton.innerHTML = "◼ cancel";
+                     player.playMusic(music);
+                 }
+             }
+
+             function changeVolume(event) {
+                 player.gain = volumeControl.value;
+             }
+
+             const playButton = document.querySelector("#playButton");
+             const volumeControl = document.querySelector("#volumeControl");
+             volumeControl.value = player.gain;
+
+             playButton.addEventListener("click", togglePlay, false);
+             volumeControl.addEventListener("input", changeVolume, false);
+
+         }
+
+         setup();
+
+        </script>
+    </body>
+</html>
